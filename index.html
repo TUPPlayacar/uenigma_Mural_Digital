@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mural Digital Interactivo | SEM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables de colores y estilos */
+        :root {
+            --primary: #006847;
+            --secondary: #CE1126;
+            --accent: #FCBF49;
+            --light: #F5F5F5;
+            --dark: #333333;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+        }
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            overflow-x: hidden;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        /* Header y navegación */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #00432a 100%);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+        }
+        .nav-item {
+            margin-left: 1.5rem;
+        }
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 0;
+            position: relative;
+        }
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+        }
+        /* Hero Section with Slider */
+        .hero {
+            height: 70vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+        .slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 300%;
+            height: 100%;
+            display: flex;
+            transition: transform 1s ease-in-out;
+        }
+        .slide {
+            width: 100vw;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .slide:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            padding: 2rem;
+        }
+        .hero-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        .pagination {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .dot.active {
+            background: white;
+        }
+        .btn {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--dark);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background: #FFD166;
+        }
+        /* Secciones */
+        .section {
+            padding: 5rem 0;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--primary);
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+        /* -- INICIO DE ESTILOS PARA TARJETAS CON GIRO -- */
+        .institutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .institution-card {
+            background-color: transparent;
+            height: 450px; /* Altura fija para la tarjeta */
+            perspective: 1000px; /* Perspectiva para el efecto 3D */
+            transition: transform 0.3s ease;
+        }
+        .institution-card:hover {
+            transform: scale(1.05); /* Efecto de zoom al pasar el cursor */
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .institution-card.is-flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .card-front {
+            background: white;
+        }
+        .card-back {
+            background: white;
+            transform: rotateY(180deg);
+            padding: 1.5rem;
+            overflow-y: auto; /* Scroll si el contenido es largo */
+        }
+        .card-back h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        .card-back p {
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .card-back ul {
+            list-style-type: ' ✔ ';
+            padding-left: 1.2rem;
+            font-size: 0.9rem;
+        }
+        .card-back ul li {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+        }
+        .btn-back {
+            margin-top: auto; /* Empuja el botón al final */
+            padding: 0.5rem 1rem;
+            border: none;
+            background-color: var(--secondary);
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+        .btn-back:hover {
+            background-color: #a50c1e;
+        }
+        .card-img {
+            height: 180px;
+            overflow: hidden;
+        }
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        .card-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; /* Permite que el contenido crezca */
+        }
+        .card-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+        }
+        .card-text {
+            margin-bottom: 1.5rem;
+            color: #666;
+            flex-grow: 1;
+        }
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--secondary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            margin-top: auto; /* Empuja el enlace al final */
+        }
+        .card-link i {
+            margin-left: 5px;
+            transition: var(--transition);
+        }
+        .card-link:hover {
+            color: #a50c1e;
+        }
+        .card-link:hover i {
+            transform: translateX(5px);
+        }
+        /* -- FIN DE ESTILOS PARA TARJETAS CON GIRO -- */
+        /* Acordeón de niveles educativos */
+        .levels-accordion {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .accordion-item {
+            margin-bottom: 1rem;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .accordion-header {
+            background: white;
+            padding: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+        .accordion-header:hover {
+            background: #e0e0e0;
+        }
+        .accordion-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .accordion-icon {
+            transition: var(--transition);
+        }
+        .accordion-content {
+            background: white;
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .accordion-content-inner {
+            padding: 1.25rem;
+            border-top: 1px solid #eee;
+        }
+        .accordion-content-inner ul {
+            list-style: none;
+            padding: 0;
+        }
+        .accordion-content-inner ul li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .accordion-content-inner ul li i {
+            color: var(--primary);
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        .accordion-item.active .accordion-content {
+            max-height: 500px;
+        }
+        /* ESTILOS PARA LA SECCIÓN DE REFORMAS EDUCATIVAS */
+        .reforms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .reform-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .reform-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        .reform-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        .heartbeat {
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        .reform-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        .reform-card p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .reform-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-top: 1rem;
+            text-align: left;
+        }
+        .reform-card.active .reform-details {
+            max-height: 300px; /* Ajusta según el contenido */
+        }
+        /* Menú circular de interacciones */
+        .interactions-section {
+            text-align: center;
+            position: relative;
+            padding: 4rem 0;
+        }
+        .circular-menu {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+        .menu-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 100;
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            animation: heartbeat 2s infinite;
+        }
+        .menu-button:hover {
+            background: #004d33;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        @keyframes heartbeat {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            15% { transform: translate(-50%, -50%) scale(1.1); }
+            30% { transform: translate(-50%, -50%) scale(1); }
+            45% { transform: translate(-50%, -50%) scale(1.1); }
+            60% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        .menu-items {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            list-style: none;
+            transform: translate(-50%, -50%);
+        }
+        .menu-item {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            transition: var(--transition);
+            transform-origin: center;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .menu-item a {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .menu-item a:hover {
+            background: #a50c1e;
+            transform: scale(1.1);
+        }
+        .menu-active .menu-item {
+            opacity: 1;
+            visibility: visible;
+        }
+        .menu-active .menu-item:nth-child(1) { transform: translate(0, -120px); }
+        .menu-active .menu-item:nth-child(2) { transform: translate(104px, -60px); }
+        .menu-active .menu-item:nth-child(3) { transform: translate(104px, 60px); }
+        .menu-active .menu-item:nth-child(4) { transform: translate(0, 120px); }
+        .menu-active .menu-item:nth-child(5) { transform: translate(-104px, 60px); }
+        .menu-active .menu-item:nth-child(6) { transform: translate(-104px, -60px); }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: var(--radius);
+            padding: 2rem;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: var(--transition);
+        }
+        .modal-close:hover {
+            color: var(--secondary);
+        }
+        .modal-title {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-right: 2rem;
+        }
+        .modal-text {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .modal-img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+        }
+        /* -- INICIO DE ESTILOS PARA NUEVO MENÚ DE PROPUESTAS -- */
+        #propuestas {
+            position: relative;
+            height: 80vh;
+            overflow: hidden;
+            background: #ececec;
+            padding: 0;
+            text-align: center;
+        }
+        #propuestas .container {
+            position: relative;
+            z-index: 2;
+            padding-top: 5rem;
+        }
+        #propuestas .section-title {
+            transition: transform 0.8s ease;
+        }
+        #propuestas.menu-deployed .section-title {
+            transform: translateY(-15vh);
+        }
+        #propuestas .section-description {
+            position: absolute;
+            top: calc(50% + 160px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease 0.5s, visibility 0.5s ease 0.5s;
+            z-index: 2;
+        }
+        #propuestas .instruction-text {
+            text-align: center;
+            margin-top: 2rem;
+            z-index: 2;
+            position: relative;
+            transition: transform 0.8s ease;
+        }
+        #propuestas.menu-deployed .instruction-text {
+            transform: translateY(20vh);
+        }
+        #propuestas.menu-deployed .section-description {
+            opacity: 1;
+            visibility: visible;
+        }
+        #propuestas #Button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            font-size: 18px;
+            text-align: center;
+            line-height: 60px;
+            background: #e74c3c;
+            border-radius: 50%;
+            color: #ececec;
+            cursor: pointer;
+            z-index: 3;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        #propuestas .Nav {
+            position: absolute;
+            margin: auto;
+            top: 0; right: 0; bottom: 0; left: 0;
+            width: 302px;
+            height: 302px;
+            font-size: 0;
+            transform: scale(0);
+            transition: transform 0.8s;
+            z-index: 2;
+        }
+        #propuestas .Nav.active {
+            transform: scale(1);
+        }
+        #propuestas .Nav a {
+            display: inline-block;
+            width: 150px;
+            height: 150px;
+            font-size: 28px;
+            text-decoration: none;
+            line-height: 150px;
+            text-align: center;
+            color: #fff;
+            animation: spinIn 0.8s ease;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        #propuestas .Nav a:hover {
+            transform: scale(1.1);
+        }
+        #propuestas .Nav a:nth-of-type(odd) { margin-right: 2px; }
+        #propuestas .Nav a:nth-child(1) { margin-bottom: 2px; background: #1abc9c; }
+        #propuestas .Nav a:nth-child(2) { background: #2ecc71; }
+        #propuestas .Nav a:nth-child(3) { background: #3498db; }
+        #propuestas .Nav a:nth-child(4) { background: #9b59b6; }
+        @keyframes spinIn {
+            0% { transform: rotate(-360deg) scale(0); opacity: 0; }
+            100% { transform: rotate(0deg) scale(1); opacity: 1; }
+        }
+        #propuestas canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        /* -- FIN DE ESTILOS PARA NUEVO MENÚ DE PROPUESTAS -- */
+
+        /* -- INICIO DE ESTILOS PARA LÍNEA DE TIEMPO -- */
+        #linea-tiempo {
+            background: #f9f9f9;
+        }
+        .timeline-slider-container {
+            position: relative;
+            width: 100%;
+            padding: 0 50px; /* Espacio para los botones */
+        }
+        .timeline-slider {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE 10+ */
+            scroll-behavior: smooth;
+        }
+        .timeline-slider::-webkit-scrollbar {
+            display: none; /* Safari and Chrome */
+        }
+        .timeline-item {
+            flex: 0 0 100%;
+            scroll-snap-align: center;
+            padding: 1rem;
+            box-sizing: border-box;
+            transition: transform 0.3s ease;
+        }
+        .timeline-item:hover {
+            transform: scale(1.02); /* Efecto de zoom */
+        }
+        .timeline-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            position: relative;
+            border-left: 5px solid var(--primary);
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .timeline-year {
+            position: absolute;
+            top: -20px;
+            left: 2rem;
+            background: var(--secondary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 700;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .timeline-title {
+            color: var(--primary);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .timeline-content ul {
+            list-style-type: '✔ ';
+            padding-left: 1.2rem;
+        }
+        .timeline-content ul li {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+        }
+        .timeline-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+        .timeline-nav:hover {
+            background: #004d33;
+            transform: translateY(-50%) scale(1.1);
+        }
+        .timeline-nav.prev {
+            left: 0;
+        }
+        .timeline-nav.next {
+            right: 0;
+        }
+        @media (min-width: 768px) {
+            .timeline-item {
+                flex-basis: 50%;
+            }
+        }
+        @media (min-width: 1024px) {
+            .timeline-item {
+                flex-basis: 33.33%;
+            }
+        }
+        /* -- FIN DE ESTILOS PARA LÍNEA DE TIEMPO -- */
+
+        /* Fuentes y créditos */
+        .sources-section {
+            background: #ececec;
+            padding: 4rem 0;
+        }
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .source-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .source-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        .source-details {
+            color: #666;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 0 1.5rem;
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        .footer-logo i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .social-icon:hover {
+            background: var(--accent);
+            color: var(--dark);
+            transform: translateY(-3px);
+        }
+        .footer-contact h3, .footer-comments h3 {
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        .footer-contact h3:after, .footer-comments h3:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
+        }
+        .footer-contact-info p {
+            margin-bottom: 0.75rem;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+        }
+        .footer-contact-info i {
+            margin-right: 10px;
+            color: var(--accent);
+            width: 20px;
+            text-align: center;
+        }
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            margin-top: 1rem;
+        }
+        .comment-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            resize: vertical;
+        }
+        .comment-btn {
+            background: var(--accent);
+            color: var(--dark);
+            border: none;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .comment-btn:hover {
+            background: #FFD166;
+        }
+        .comments-display-area {
+            margin-top: 1.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .comment-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            color: #ccc;
+            font-size: 0.9rem;
+            word-wrap: break-word;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #444;
+            font-size: 0.9rem;
+            color: #999;
+        }
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1.25rem; }
+        }
+        @media (max-width: 768px) {
+            .hamburger { display: block; }
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                right: -100%;
+                flex-direction: column;
+                background: var(--primary);
+                width: 80%;
+                height: calc(100vh - 70px);
+                transition: var(--transition);
+                box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+                padding: 2rem;
+            }
+            .nav-menu.active { right: 0; }
+            .nav-item { margin: 1.5rem 0; }
+            .hero-title { font-size: 2rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .circular-menu { width: 250px; height: 250px; }
+            .menu-active .menu-item:nth-child(1) { transform: translate(0, -100px); }
+            .menu-active .menu-item:nth-child(2) { transform: translate(87px, -50px); }
+            .menu-active .menu-item:nth-child(3) { transform: translate(87px, 50px); }
+            .menu-active .menu-item:nth-child(4) { transform: translate(0, 100px); }
+            .menu-active .menu-item:nth-child(5) { transform: translate(-87px, 50px); }
+            .menu-active .menu-item:nth-child(6) { transform: translate(-87px, -50px); }
+            .reforms-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1.5rem;
+            }
+            .reform-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 1.7rem;
+            }
+        }
+        @media (max-width: 576px) {
+            .hero { height: 60vh; }
+            .hero-title { font-size: 1.75rem; }
+            .section { padding: 3rem 0; }
+            .circular-menu { width: 200px; height: 200px; }
+            .menu-button { width: 60px; height: 60px; font-size: 20px; }
+            .menu-item a { width: 50px; height: 50px; font-size: 18px; }
+            .menu-active .menu-item:nth-child(1) { transform: translate(0, -80px); }
+            .menu-active .menu-item:nth-child(2) { transform: translate(69px, -40px); }
+            .menu-active .menu-item:nth-child(3) { transform: translate(69px, 40px); }
+            .menu-active .menu-item:nth-child(4) { transform: translate(0, 80px); }
+            .menu-active .menu-item:nth-child(5) { transform: translate(-69px, 40px); }
+            .menu-active .menu-item:nth-child(6) { transform: translate(-69px, -40px); }
+            .reforms-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* Estilos originales para modales y tarjetas de fuentes */
+        #sepModal .modal-content,
+        #estatalesModal .modal-content,
+        #publicasModal .modal-content,
+        #privadasModal .modal-content,
+        #conacytModal .modal-content,
+        #universidadesModal .modal-content {
+            border-left: 5px solid var(--primary);
+        }
+        #formacionModal .modal-content {
+            border-left: 5px solid #1abc9c;
+        }
+        #tecnologiaModal .modal-content {
+            border-left: 5px solid #2ecc71;
+        }
+        #equidadModal .modal-content {
+            border-left: 5px solid #3498db;
+        }
+        #vinculacionModal .modal-content {
+            border-left: 5px solid #9b59b6;
+        }
+        .source-item:hover {
+            transform: scale(1.05) rotate(1deg);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Mural Digital | Edu MX</span>
+            </div>
+            <button class="hamburger" id="hamburger">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li class="nav-item"><a href="#instituciones" class="nav-link">Instituciones</a></li>
+                <li class="nav-item"><a href="#niveles" class="nav-link">Niveles Educativos</a></li>
+                <li class="nav-item"><a href="#reformas" class="nav-link">Reformas</a></li>
+                <li class="nav-item"><a href="#interacciones" class="nav-link">Interacciones</a></li>
+                <li class="nav-item"><a href="#propuestas" class="nav-link">Propuestas</a></li>
+                <li class="nav-item"><a href="#linea-tiempo" class="nav-link">Línea de Tiempo</a></li>
+                <li class="nav-item"><a href="#fuentes" class="nav-link">Fuentes</a></li>
+            </ul>
+        </div>
+    </header>
+    <section class="hero">
+        <div class="slider" id="slider">
+            <div class="slide" style="background-image: url('img_sep/logo_educ.jpg');"></div>
+            <div class="slide" style="background-image: url('img_sep/seplogo.jpg');"></div>
+            <div class="slide" style="background-image: url('img_sep/nem.jpg');"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">Sistema Educativo Mexicano</h1>
+            <p class="hero-subtitle">Explora la estructura, organización y propuestas de mejora del sistema educativo nacional</p>
+            <a href="#instituciones" class="btn">Comenzar Exploración</a>
+        </div>
+        <div class="pagination" id="pagination">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </section>
+    <section id="instituciones" class="section">
+        <div class="container">
+            <h2 class="section-title">🏛️ Instituciones y Organismos</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem;">El Sistema Educativo Mexicano está compuesto por diversas instituciones que colaboran para brindar servicios educativos a la población.</p>
+            
+            <div class="institutions-grid">
+                <!-- Tarjeta 1 -->
+                <div class="institution-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-img"><img src="img_sep/sep.jpg" alt="SEP"></div>
+                            <div class="card-content">
+                                <h3 class="card-title">Secretaría de Educación Pública (SEP)</h3>
+                                <p class="card-text">Organismo rector de la educación en México, establece políticas y programas educativos a nivel nacional.</p>
+                                <a class="card-link">Más información <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Secretaría de Educación Pública (SEP)</h4>
+                            <p>La SEP es el órgano rector del sistema educativo nacional: formula políticas, establece planes y programas de estudio, supervisa la educación básica y coordina acciones nacionales.</p>
+                            <h4>Funciones</h4>
+                            <ul>
+                                <li>Diseño de planes y programas de estudio nacionales.</li>
+                                <li>Políticas de inclusión y cobertura educativa.</li>
+                                <li>Coordinación con autoridades estatales.</li>
+                            </ul>
+                            <button class="btn-back">Regresar ↩️</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tarjeta 2 -->
+                <div class="institution-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-img"><img src="img_sep/autoridades.jpg" alt="Autoridades Estatales"></div>
+                            <div class="card-content">
+                                <h3 class="card-title">Autoridades Estatales</h3>
+                                <p class="card-text">Administran la operación educativa a nivel estatal (educación básica, media superior).</p>
+                                <a class="card-link">Más información <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Autoridades Estatales de Educación</h4>
+                            <p>Cada estado cuenta con una autoridad educativa local que administra y opera la educación básica y media superior en su jurisdicción.</p>
+                            <h4>Funciones</h4>
+                            <ul>
+                                <li>Gestión escolar local.</li>
+                                <li>Administración de plazas y recursos.</li>
+                                <li>Infraestructura y servicios educativos.</li>
+                            </ul>
+                            <button class="btn-back">Regresar ↩️</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tarjeta 3 -->
+                <div class="institution-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-img"><img src="img_sep/unam.jpg" alt="Universidades"></div>
+                            <div class="card-content">
+                                <h3 class="card-title">Instituciones de Educación Superior</h3>
+                                <p class="card-text">Universidades públicas y privadas, tecnológicos y normales que forman profesionales en diversas áreas.</p>
+                                <a class="card-link">Más información <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Universidades y Centros de Educación Superior</h4>
+                            <p>Incluye universidades públicas autónomas (UNAM, IPN, UAM, universidades estatales), tecnológicos (TecNM), e instituciones privadas. Tienen autonomía académica y administrativa, ofrecen licenciaturas, ingenierías y posgrado.</p>
+                            <h4>Roles</h4>
+                            <ul>
+                                <li>Formación profesional y técnica.</li>
+                                <li>Investigación y vinculación con el sector productivo.</li>
+                                <li>Extensión y formación permanente.</li>
+                            </ul>
+                            <button class="btn-back">Regresar ↩️</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tarjeta 4 -->
+                <div class="institution-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-img"><img src="img_sep/conacyt.jpg" alt="CONACYT"></div>
+                            <div class="card-content">
+                                <h3 class="card-title">CONACYT</h3>
+                                <p class="card-text">Impulsa la ciencia, la investigación y financiamiento de posgrados e investigación.</p>
+                                <a class="card-link">Más información <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <h4>CONACYT</h4>
+                            <p>Consejo Nacional de Ciencia y Tecnología. Financia investigación, becas de posgrado y políticas de ciencia y tecnología, fortaleciendo la relación entre educación superior e investigación.</p>
+                            <h4>Importancia</h4>
+                            <ul>
+                                <li>Becas y apoyo a investigación.</li>
+                                <li>Política de desarrollo científico.</li>
+                            </ul>
+                            <button class="btn-back">Regresar ↩️</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tarjeta 5 -->
+                <div class="institution-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-img"><img src="img_sep/privadas.jpg" alt="Instituciones Privadas"></div>
+                            <div class="card-content">
+                                <h3 class="card-title">Instituciones Privadas</h3>
+                                <p class="card-text">Ofrecen alternativas educativas en todos los niveles; reguladas para acreditación y validez.</p>
+                                <a class="card-link">Más información <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Instituciones Privadas</h4>
+                            <p>Escuelas y universidades privadas que complementan la oferta educativa. Están sujetas a regulación y acreditación para reconocimiento de validez oficial cuando corresponda.</p>
+                            <h4>Aspectos</h4>
+                            <ul>
+                                <li>Oferta educativa diversa.</li>
+                                <li>Modelos pedagógicos alternativos.</li>
+                            </ul>
+                            <button class="btn-back">Regresar ↩️</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tarjeta 6 -->
+                <div class="institution-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-img"><img src="img_sep/inea.jpg" alt="Educación para Adultos"></div>
+                            <div class="card-content">
+                                <h3 class="card-title">Educación para Adultos y Técnica</h3>
+                                <p class="card-text">INEA, CONALEP y programas de capacitación laboral que amplían cobertura y oportunidades.</p>
+                                <a class="card-link">Más información <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <h4>Programas para Adultos y Capacitación</h4>
+                            <p>Programas como el INEA y modalidades de capacitación técnica (CONALEP, CETIS) permiten la inclusión de jóvenes y adultos que no completaron estudios y ofrecen capacitación para el trabajo.</p>
+                            <button class="btn-back" style="margin-top: 2rem;">Regresar ↩️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="niveles" class="section" style="background: #f9f9f9;">
+        <div class="container">
+            <h2 class="section-title">🎓 Niveles Educativos</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem;">El sistema educativo mexicano se organiza en varios niveles que conforman la trayectoria formativa de los estudiantes.</p>
+            
+            <div class="levels-accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h3 class="accordion-title">🧮 Educación Básica</h3>
+                        <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            <p>Comprende preescolar, primaria y secundaria. Es obligatoria y sienta las bases para el desarrollo de competencias fundamentales.</p>
+                            <ul>
+                                <li><i class="fas fa-shapes"></i>Preescolar (3 años)</li>
+                                <li><i class="fas fa-book-open-reader"></i>Primaria (6 años)</li>
+                                <li><i class="fas fa-user-graduate"></i>Secundaria (3 años)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h3 class="accordion-title">🛠️ Educación Media Superior</h3>
+                        <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            <p>También conocida como bachillerato o preparatoria. Prepara a los estudiantes para la educación superior o el mundo laboral.</p>
+                            <ul>
+                                <li><i class="fas fa-book"></i>Bachillerato general</li>
+                                <li><i class="fas fa-cogs"></i>Bachillerato tecnológico</li>
+                                <li><i class="fas fa-screwdriver-wrench"></i>Profesional técnico</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h3 class="accordion-title">👩‍🎓 Educación Superior</h3>
+                        <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            <p>Comprende estudios de técnico superior universitario, licenciatura, especialidad, maestría y doctorado.</p>
+                            <ul>
+                                <li><i class="fas fa-user-tie"></i>Técnico Superior Universitario (2-3 años)</li>
+                                <li><i class="fas fa-university"></i>Licenciatura (4-5 años)</li>
+                                <li><i class="fas fa-graduation-cap"></i>Posgrado (especialidad, maestría, doctorado)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h3 class="accordion-title">⚙️ Otros tipos de educación</h3>
+                        <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            <p>Además de los niveles principales, el sistema educativo mexicano incluye otras modalidades formativas:</p>
+                            <ul>
+                                <li><i class="fas fa-wheelchair"></i>Educación especial</li>
+                                <li><i class="fas fa-users"></i>Educación para adultos</li>
+                                <li><i class=""></i>🗞️ Prepa modular Sabatina</li>
+                                <li><i class="fas fa-briefcase"></i>Formación para el trabajo</li>
+                                <li><i class="fas fa-feather-alt"></i>Educación indígena</li>
+                                <li><i class="fas fa-palette"></i>Educación artística</li>
+                                <li><i class="fas fa-futbol"></i>Educación física</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="reformas" class="section">
+        <div class="container">
+            <h2 class="section-title">📜 Reformas Educativas</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem;">
+                La Nueva Escuela Mexicana (NEM) es un modelo educativo que busca transformar 
+                la educación en México con base en los siguientes principios:
+            </p>
+            
+            <div class="reforms-grid">
+                <div class="reform-card">
+                    <div class="reform-icon heartbeat">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h3>Enfoque pedagógico</h3>
+                    <p>Proyectos integradores y problemáticas reales</p>
+                    <div class="reform-details"><hr>
+                        <p>📌 Se abandona el modelo de asignaturas rígidas para trabajar con proyectos integradores 
+                        que parten de problemáticas reales de la escuela y la comunidad.</p>
+                        <p>📌 Este enfoque busca que los estudiantes desarrollen habilidades para resolver problemas 
+                        del mundo real, fomentando el aprendizaje significativo y la aplicación práctica de conocimientos.</p>
+                    </div>
+                </div>
+                
+                <div class="reform-card">
+                    <div class="reform-icon heartbeat">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                    <h3>Contexto sociocultural</h3>
+                    <p>Adaptación a la realidad de los estudiantes</p>
+                    <div class="reform-details"><hr>
+                        <p>📌 La NEM busca adaptar la educación a la realidad de los estudiantes, considerando sus 
+                        contextos económicos, geográficos, sociales y culturales.</p>
+                        <p>📌 Reconoce que cada comunidad tiene particularidades que deben ser consideradas en el 
+                        proceso educativo para hacerlo más relevante y efectivo.</p>
+                    </div>
+                </div>
+                
+                <div class="reform-card">
+                    <div class="reform-icon heartbeat">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <h3>Principios humanistas</h3>
+                    <p>Educación en valores y derechos humanos</p>
+                    <div class="reform-details"><hr>
+                        <p>📌 Promueve la educación en valores, el respeto por los derechos humanos, la empatía y 
+                        la solución de problemas comunes a través del diálogo y la democracia.</p>
+                        <p>📌 Estos principios buscan formar ciudadanos conscientes de su responsabilidad social 
+                        y capaces de contribuir al bien común.</p>
+                    </div>
+                </div>
+                
+                <div class="reform-card">
+                    <div class="reform-icon heartbeat">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3>Formación docente</h3>
+                    <p>Capacitación continua y desarrollo profesional</p>
+                    <div class="reform-details"><hr>
+                        <p>📌 Se garantiza la formación continua y la capacitación de los maestros, permitiendo 
+                        que la escuela sea el centro del sistema educativo y se apoye el buen desempeño profesional.</p>
+                        <p>📌 Los docentes reciben acompañamiento para implementar los nuevos enfoques pedagógicos 
+                        y adaptarse a las necesidades cambiantes de los estudiantes.</p>
+                        <p>📌 Programa de Formación, Actualización y Capacitación de las Maestras y los Maestros en la Nueva Escuela Mexicana de la Educación Media Superior (COSFAC)</p>
+                    </div>
+                </div>
+                
+                <div class="reform-card">
+                    <div class="reform-icon heartbeat">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Inclusión</h3>
+                    <p>Educación para todas y todos con enfoque decolonial</p>
+                    <div class="reform-details"><hr>
+                        <p>📌 Se promueve una educación inclusiva que abarca desde la educación inicial hasta la superior, 
+                        con un enfoque decolonial para la integración de todas y todos.</p>
+                        <p>📌 Este principio busca eliminar barreras de aprendizaje y participación, reconociendo 
+                        y valorando la diversidad como un elemento enriquecedor del proceso educativo.</p>
+                    </div>
+                </div>
+                
+                <div class="reform-card">
+                    <div class="reform-icon heartbeat">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Desarrollo integral</h3>
+                    <p>Formación de estudiantes críticos y reflexivos</p>
+                    <div class="reform-details"><hr>
+                        <p>📌 Se busca formar estudiantes críticos, reflexivos y conscientes de su entorno, 
+                        capaces de interactuar y participar activamente en la construcción de una sociedad 
+                        más justa y equitativa.</p>
+                        <p>📌 El desarrollo integral considera no sólo lo académico, sino también lo emocional, 
+                        social y físico de los estudiantes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="interacciones" class="section interactions-section">
+        <div class="container">
+            <h2 class="section-title">Interacciones entre Instituciones</h2>
+            <p style="text-align:center; max-width: 800px; margin: 0 auto 2rem;">Las diferentes instituciones del sistema educativo mexicano colaboran y se relacionan de diversas maneras para garantizar la calidad y cobertura educativa.</p>
+            
+            <div class="circular-menu">
+                <div class="menu-button" id="menuButton"><i class="fas fa-plus"></i></div>
+                <ul class="menu-items">
+                    <li class="menu-item"><a href="#" data-modal="sep"><i class="fas fa-home"></i></a></li>
+                    <li class="menu-item"><a href="#" data-modal="estatales"><i class="fas fa-gears"></i></a></li>
+                    <li class="menu-item"><a href="#" data-modal="publicas"><i class="fas fa-users"></i></a></li>
+                    <li class="menu-item"><a href="#" data-modal="privadas"><i class="fas fa-sitemap"></i></a></li>
+                    <li class="menu-item"><a href="#" data-modal="conacyt"><i class="fas fa-tags"></i></a></li>
+                    <li class="menu-item"><a href="#" data-modal="universidades"><i class="fas fa-flask"></i></a></li>
+                </ul>
+            </div>
+            
+            <div class="text-center" style="margin-top: 2rem;">
+                <p>Haz clic en el botón central para explorar las instituciones y luego selecciona cada ícono para conocer sus funciones.</p>
+            </div>
+        </div>
+    </section>
+    <section id="propuestas" class="section">
+        <div class="container">
+            <h2 class="section-title">🧩 Propuestas de Mejora</h2>
+        </div>
+        <div id="Button" class="fas fa-fire"></div>
+        <div class="Nav">
+            <a data-modal="formacion"><span class="fas fa-school infra-icon"></span></a>
+            <a data-modal="tecnologia"><span class="fas fa-laptop-code"></span></a>
+            <a data-modal="equidad"><span class="fas fa-balance-scale"></span></a>
+            <a data-modal="vinculacion"><span class="fa-solid fa-screwdriver-wrench"></span></a>
+        </div>
+        <p class="section-description">Ideas y estrategias para fortalecer el sistema educativo mexicano y enfrentar sus desafíos actuales.</p>
+        <p class="instruction-text">Haz clic en el botón para explorar.</p>
+        <canvas></canvas>
+        <audio id="explosionSound" src="https://www.soundjay.com/button/sounds/button-16.mp3" preload="auto"></audio>
+    </section>
+
+    <!-- INICIO: NUEVA SECCIÓN DE LÍNEA DE TIEMPO -->
+    <section id="linea-tiempo" class="section">
+        <div class="container">
+            <h2 class="section-title">⏳ Línea de Tiempo Evolutiva</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem;">Un recorrido por los hitos más importantes que han moldeado la educación en México a lo largo de la historia.</p>
+            <div class="timeline-slider-container">
+                <button class="timeline-nav prev"><i class="fas fa-chevron-left"></i></button>
+                <div class="timeline-slider">
+                    <!-- Item 1 -->
+                    <div class="timeline-item">
+                        <div class="timeline-card">
+                            <div class="timeline-year">1921-1924</div>
+                            <h4 class="timeline-title">Educación Nacionalista y Creación de la SEP</h4>
+                            <div class="timeline-content">
+                                <ul>
+                                    <li>José Vasconcelos desarrolla el proyecto de Educación Nacionalista.</li>
+                                    <li>Se funda la Secretaría de Educación Pública (SEP) para centralizar la política educativa.</li>
+                                    <li>Creación de 671 bibliotecas con apoyo de Gabriela Mistral.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="timeline-item">
+                        <div class="timeline-card">
+                            <div class="timeline-year">1924-1942</div>
+                            <h4 class="timeline-title">Expansión y Especialización</h4>
+                            <div class="timeline-content">
+                                <ul>
+                                    <li>Se vinculan los Talleres Gráficos de la Nación a la SEP.</li>
+                                    <li>Creación de departamentos especializados como Educación Indígena y Alfabetización.</li>
+                                    <li>Impulso a la Educación Rural Indígena y fomento de escuelas técnicas.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div class="timeline-item">
+                        <div class="timeline-card">
+                            <div class="timeline-year">1934</div>
+                            <h4 class="timeline-title">La Educación Socialista</h4>
+                            <div class="timeline-content">
+                                <ul>
+                                    <li>Se modifica la Constitución para que la educación sea socialista, eliminando la doctrina religiosa.</li>
+                                    <li>Lázaro Cárdenas regula la educación privada y prohíbe la participación de corporaciones religiosas.</li>
+                                    <li>Se apoya el desarrollo del Instituto Politécnico Nacional (IPN).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 4 -->
+                    <div class="timeline-item">
+                        <div class="timeline-card">
+                            <div class="timeline-year">1946</div>
+                            <h4 class="timeline-title">Regreso a la Educación Armónica</h4>
+                            <div class="timeline-content">
+                                <ul>
+                                    <li>Se elimina el contenido ideológico socialista de la educación.</li>
+                                    <li>Se busca un desarrollo armónico del ser humano, fomentando el amor a la patria y la solidaridad internacional.</li>
+                                    <li>La perspectiva se refuerza con la Declaración Universal de los Derechos Humanos de 1948.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 5 -->
+                    <div class="timeline-item">
+                        <div class="timeline-card">
+                            <div class="timeline-year">1957-1970</div>
+                            <h4 class="timeline-title">Expansión y Mejora</h4>
+                            <div class="timeline-content">
+                                <ul>
+                                    <li>Se establece la gratuidad de la educación primaria.</li>
+                                    <li>Adolfo López Mateos lanza el Plan de Once Años y crea los primeros libros de texto gratuitos.</li>
+                                    <li>Luis Echeverría impulsa la "Revolución Educativa", creando el CCH y el Colegio de Bachilleres.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- Item 6 -->
+                    <div class="timeline-item">
+                        <div class="timeline-card">
+                            <div class="timeline-year">1980-2000</div>
+                            <h4 class="timeline-title">Descentralización y Modernización</h4>
+                            <div class="timeline-content">
+                                <ul>
+                                    <li>Se inicia la descentralización educativa, transfiriendo responsabilidades a los estados.</li>
+                                    <li>Se eleva la formación de docentes a nivel de licenciatura y se reconoce la autonomía universitaria.</li>
+                                    <li>Se firma el Acuerdo Nacional para la Modernización de la Educación Básica (ANMEB).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- Item 7 -->
+                    <div class="timeline-item">
+                        <div class="timeline-card">
+                            <div class="timeline-year">2000-2020</div>
+                            <h4 class="timeline-title">Enfoque en la Calidad y Evaluación</h4>
+                            <div class="timeline-content">
+                                <ul>
+                                    <li>Se hace obligatorio el nivel preescolar.</li>
+                                    <li>Se promulga la Reforma Educativa de 2013 de  Peña Nieto, centrada en la evaluación docente (INEE) y la creacion del SPD.</li>
+                                    <li>En 2019 López Obrador cancela la reforma anterior y se crea la Nueva Escuela Mexicana (NEM) y nace la USICAMM.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="timeline-nav next"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+    <!-- FIN: NUEVA SECCIÓN DE LÍNEA DE TIEMPO -->
+
+    <section id="fuentes" class="sources-section">
+        <div class="container">
+            <h2 class="section-title">📚 Fuentes de Referencia</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem;">Información basada en fuentes confiables y actualizadas sobre el sistema educativo mexicano.</p>
+            
+            <div class="sources-grid">
+                <div class="source-item">
+                    <h3 class="source-title">Ley General de Educación</h3>
+                    <p class="source-details">Cámara de Diputados del H. Congreso de la Unión. (2019, 30 de septiembre). Ley General de Educación (Texto vigente con últimas reformas DOF 07-06-2024). Diario Oficial de la Federación. 
+                    <a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LGE.pdf" target="_blank" rel="noopener noreferrer">
+                     https://www.diputados.gob.mx/LeyesBiblio/pdf/LGE.pdf</p>
+                    </a>
+                </div>
+                
+            <div class="source-item">
+                <h3 class="source-title">NEM</h3>
+                <p class="source-details">
+                  <em>Hernández Moreno, M. V. (2024). La Nueva Escuela Mexicana y su impacto en la sociedad</em>. Subsecretaría de Educación Básica, Secretaría de Educación Pública. 
+                     <a href="https://educacionbasica.sep.gob.mx/wp-content/uploads/2024/05/La-NEM-y-su-impacto-en-la-sociedad.pdf" target="_blank" rel="noopener noreferrer">
+                     https://educacionbasica.sep.gob.mx/wp-content/uploads/2024/05/La-NEM-y-su-impacto-en-la-sociedad.pdf
+                    </a>
+                </p>
+            </div>
+                
+                <div class="source-item">
+                    <h3 class="source-title">SEP</h3>
+                    <p class="source-details">Secretaría de Educación Pública. (2022). Acuerdo Núm. 14/08/22 por el que se establece el Plan de Estudio para la educación preescolar, primaria y secundaria. Diario Oficial de la Federación.
+                        <a href="https://www.dof.gob.mx/nota_detalle.php?codigo=5661845&fecha=19/08/2022#gsc.tab=0" target="_blank" rel="noopener noreferrer">
+                        https://www.dof.gob.mx/nota_detalle.php?codigo=5661845&fecha=19/08/2022#gsc.tab=0
+                         </a>
+                    </p>
+                </div>
+                <div class="source-item">
+                    <h3 class="source-title">SEP</h3>
+                    <p class="source-details">Secretaría de Educación Pública (2020). Programa Sectorial de Educación 2020-2024.
+                        <a href="https://www.gob.mx/cms/uploads/attachment/file/562380/Programa_Sectorial_de_Educaci_n_2020-2024.pdf" target="_blank" rel="noopener noreferrer">
+                         https://www.gob.mx/cms/uploads/attachment/file/562380/Programa_Sectorial_de_Educaci_n_2020-2024.pdf
+                        </a>
+                    </p>
+                </div>
+                
+                <div class="source-item">
+                    <h3 class="source-title">UNESCO</h3>
+                    <p class="source-details">UNESCO. (2021). Revisión Nacional 2020 de la Educación para Todos. México: UNESCO.</p>
+                </div>
+                <div class="source-item">
+                    <h3 class="source-title">UNAM</h3>
+                    <p class="source-details">Velasco, A. (2009). Humanismo. México: Universidad Nacional Autónoma de México.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Educación MX</span>
+                    </div>
+                    <p>Mural digital interactivo sobre el sistema educativo mexicano. Diseñado para facilitar la comprensión de su estructura y organización.</p>
+                    <div class="footer-social">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-contact">
+                    <h3>Contacto</h3>
+                    <div class="footer-contact-info">
+                        <p><i class="fas fa-user"></i>Autor: Ing. Héctor L. Pérez</p>
+                        <p><i class="fas fa-envelope"></i>ue0204@unienigma.edu.mx</p>
+                        <p><i class="fas fa-phone"></i>+52 (984) 211-9971</p>
+                        <p><i class="fas fa-map-marker-alt"></i>Playa del Carmen, Q. Roo.</p>
+                    </div>
+                </div>
+                
+                <div class="footer-comments">
+                    <h3>Comentarios</h3>
+                    <p>Déjanos tu opinión.</p>
+                    <form class="comment-form" id="commentForm">
+                        <textarea id="commentInput" class="comment-input" placeholder="Escribe tu comentario aquí..." rows="3"></textarea>
+                        <button type="submit" class="comment-btn">Comentar</button>
+                    </form>
+                    <div class="comments-display-area" id="commentsDisplay">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Mural Digital Interactivo - Sistema Educativo Mexicano. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- Modales existentes -->
+    <div class="modal" id="sepModal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2 class="modal-title">Secretaría de Educación Pública (SEP)</h2>
+            <div class="modal-text">
+                <p>La SEP es la institución rectora del sistema educativo mexicano.
+                Sus principales funciones incluyen establecer políticas y programas educativos, coordinar la educación en todos sus niveles y administrar los recursos federales.</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="estatalesModal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2 class="modal-title">Gobiernos Estatales</h2>
+            <div class="modal-text">
+                <p>Son responsables de la operación y administración de los servicios educativos en sus respectivas entidades, implementando políticas federales y gestionando escuelas y personal.</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="publicasModal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2 class="modal-title">Escuelas Públicas</h2>
+            <div class="modal-text">
+                <p>Instituciones financiadas por el Estado que ofrecen educación gratuita y atienden a la mayor parte de la población estudiantil, siguiendo los planes de la SEP.</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="privadasModal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2 class="modal-title">Escuelas Privadas</h2>
+            <div class="modal-text">
+                <p>Gestionadas por particulares con financiamiento privado. Deben cumplir con los planes oficiales de la SEP para obtener el Reconocimiento de Validez Oficial de Estudios (RVOE).</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="conacytModal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2 class="modal-title">CONACyT</h2>
+            <div class="modal-text">
+                <p>El Consejo Nacional de Ciencia y Tecnología promueve la investigación científica y el desarrollo tecnológico, otorgando becas y financiando proyectos.</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="universidadesModal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2 class="modal-title">Universidades</h2>
+            <div class="modal-text">
+                <p>Instituciones de educación superior, públicas o privadas, que imparten licenciaturas y posgrados, realizan investigación y difunden la cultura.</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="formacionModal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2 class="modal-title"><i class="fas fa-school infra-icon"></i> Infraestructura</h2>
+            <div class="modal-text">
+                <p>Acondicionar los espacios físicos, mobiliarios, equipos y ambientes de aprendizaje que son necesarios para llevar a cabo los procesos de enseñanza-aprendizaje para garantizar el funcionamiento de las instituciones educativas, además de ser cómodos y confortables.</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="tecnologiaModal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2 class="modal-title"><i class="fas fa-laptop-code"></i> Tecnología Educativa</h2>
+            <div class="modal-text">
+                <p>Incorporar herramientas digitales en todos los niveles educativos y garantizar acceso a internet en todas las escuelas.</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="equidadModal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2 class="modal-title"><i class="fas fa-balance-scale"></i> Equidad Educativa</h2>
+            <div class="modal-text">
+                <p>Reducir las brechas de acceso y calidad entre diferentes regiones y grupos socioeconómicos.</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="vinculacionModal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2 class="modal-title"><i class="fas fa-wrench"></i> Vinculación con el trabajo</h2>
+            <div class="modal-text">
+                <p>Modelos duales y prácticas profesionales entre media superior, superior y empresas (mediano plazo).</p>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // -- SCRIPT DE ANIMACIÓN DE PROPUESTAS --
+        $(document).ready(function() {
+            const proposalsSection = $('#propuestas');
+            if (proposalsSection.length) {
+                const canvas = proposalsSection.find('canvas')[0];
+                const context = canvas.getContext('2d');
+                const setCanvasSize = () => {
+                    canvas.width = proposalsSection.width();
+                    canvas.height = proposalsSection.height();
+                };
+                setCanvasSize();
+                let Projectile;
+                let State = false;
+                let Explode = false;
+                let Collapse = false;
+                let Particles = [];
+                const colors = ["#1abc9c", "#2ecc71", "#3498db", "#9b59b6", "#f1c40f", "#e67e22", "#e74c3c"];
+                const explosionSound = document.getElementById('explosionSound');
+                function Proj() {
+                    this.radius = 5.2;
+                    this.x = Math.random() * canvas.width;
+                    this.y = canvas.height + this.radius;
+                    this.color = "#e74c3c";
+                    this.velocity = {x: 0, y: 0};
+                    this.speed = 12;
+                }
+                Proj.prototype = {
+                    Update: function() {
+                        const dx = canvas.width / 2 - this.x;
+                        const dy = canvas.height / 2 - this.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance <= 10) {
+                            Explode = true;
+                            $('#propuestas .Nav').addClass('active');
+                            if(explosionSound) explosionSound.play();
+                        } else {
+                            this.velocity.x = (dx / distance) * this.speed;
+                            this.velocity.y = (dy / distance) * this.speed;
+                            this.x += this.velocity.x;
+                            this.y += this.velocity.y;
+                        }
+                    },
+                    Draw: function() {
+                        context.beginPath();
+                        context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                        context.fillStyle = this.color;
+                        context.fill();
+                        context.closePath();
+                    }
+                };
+                function Particle() {
+                    this.x = canvas.width / 2;
+                    this.y = canvas.height / 2;
+                    this.radius = 4;
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                    this.velocity = { x: (Math.random() < 0.5 ? -1 : 1) * Math.random() * 10, y: (Math.random() < 0.5 ? -1 : 1) * Math.random() * 10 };
+                    this.speed = 25;
+                    this.active = true;
+                }
+                Particle.prototype = {
+                    Update: function() {
+                        if (Collapse) {
+                            const dx = canvas.width / 2 - this.x;
+                            const dy = canvas.height / 2 - this.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            this.velocity.x = (dx / distance) * this.speed;
+                            this.velocity.y = (dy / distance) * this.speed;
+                            this.x += this.velocity.x;
+                            this.y += this.velocity.y;
+                            if (distance <= 15) this.active = false;
+                        } else {
+                            this.x += this.velocity.x;
+                            this.y += this.velocity.y;
+                        }
+                    },
+                    Draw: function() {
+                        context.beginPath();
+                        context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                        context.lineWidth = 2.2;
+                        context.strokeStyle = this.color;
+                        context.stroke();
+                        context.closePath();
+                    }
+                };
+                function Update() {
+                    if (Particles.length < 100) {
+                        for (let i = Particles.length; i < 100; i++) {
+                            Particles.push(new Particle());
+                        }
+                    }
+                    if (Explode || Collapse) {
+                        Particles.forEach(p => p.Update());
+                    }
+                    Particles = Particles.filter(p => p.active);
+                    if (State && !Explode) {
+                        Projectile.Update();
+                    }
+                    Render();
+                    requestAnimationFrame(Update);
+                }
+                function Render() {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    if (Explode || Collapse) {
+                        Particles.forEach(p => p.Draw());
+                    }
+                    if (State && !Explode) {
+                        Projectile.Draw();
+                    }
+                }
+                $('#propuestas #Button').click(function(e) {
+                    e.stopPropagation();
+                    State = !State;
+                    proposalsSection.toggleClass('menu-deployed');
+                    if (Explode && !State) {
+                        Collapse = true;
+                    } else {
+                        Collapse = false;
+                        Particles = [];
+                    }
+                    if (State) {
+                        Projectile = new Proj();
+                    } else {
+                        Projectile = null;
+                        Explode = false;
+                        $('#propuestas .Nav').removeClass('active');
+                    }
+                    $(this).toggleClass('fa-fire fa-times');
+                });
+                $('#propuestas .Nav a[data-modal]').on('click', function(e) {
+                    e.preventDefault();
+                    const modalId = $(this).data('modal') + 'Modal';
+                    $('#' + modalId).addClass('active');
+                });
+                $(window).resize(setCanvasSize);
+                Update();
+            }
+        });
+        // -- SCRIPT DE FUNCIONALIDADES GENERALES Y COMENTARIOS --
+        document.addEventListener('DOMContentLoaded', () => {
+            // Menu Hamburguesa
+            const hamburger = document.getElementById('hamburger');
+            const navMenu = document.getElementById('navMenu');
+            if (hamburger) {
+                hamburger.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                    hamburger.innerHTML = navMenu.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+                });
+            }
+            // Cerrar menú al hacer clic en un enlace
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    if(navMenu.classList.contains('active')) {
+                        navMenu.classList.remove('active');
+                        hamburger.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                });
+            });
+            // Acordeón de niveles educativos
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                header.addEventListener('click', () => {
+                    const currentlyActive = document.querySelector('.accordion-item.active');
+                    if (currentlyActive && currentlyActive !== item) {
+                        currentlyActive.classList.remove('active');
+                    }
+                    item.classList.toggle('active');
+                });
+            });
+            // Menú circular de interacciones
+            const menuButton = document.getElementById('menuButton');
+            const circularMenu = document.querySelector('.circular-menu');
+            if (menuButton) {
+                menuButton.addEventListener('click', () => {
+                    circularMenu.classList.toggle('menu-active');
+                    menuButton.innerHTML = circularMenu.classList.contains('menu-active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-plus"></i>';
+                });
+            }
+            // Lógica de Modales (unificada)
+            const modals = document.querySelectorAll('.modal');
+            const modalOpenTriggers = document.querySelectorAll('[data-modal]');
+            const modalCloseButtons = document.querySelectorAll('.modal-close');
+            modalOpenTriggers.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const modalId = item.getAttribute('data-modal') + 'Modal';
+                    const modal = document.getElementById(modalId);
+                    if (modal) modal.classList.add('active');
+                });
+            });
+            modalCloseButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    button.closest('.modal').classList.remove('active');
+                });
+            });
+            modals.forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            });
+            // Lógica para girar tarjetas de instituciones
+            const flipTriggers = document.querySelectorAll('.institution-card .card-link');
+            const flipBackTriggers = document.querySelectorAll('.institution-card .btn-back');
+            flipTriggers.forEach(trigger => {
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    trigger.closest('.institution-card').classList.add('is-flipped');
+                });
+            });
+            flipBackTriggers.forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    trigger.closest('.institution-card').classList.remove('is-flipped');
+                });
+            });
+            // Smooth scroll para enlaces de navegación
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 70, // Ajuste por el header fijo
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            // LÓGICA PARA LA SECCIÓN DE COMENTARIOS
+            const commentForm = document.getElementById('commentForm');
+            const commentInput = document.getElementById('commentInput');
+            const commentsDisplay = document.getElementById('commentsDisplay');
+            const commentsStorageKey = 'interactiveMuralComments';
+            const loadComments = () => {
+                const savedComments = JSON.parse(localStorage.getItem(commentsStorageKey)) || [];
+                commentsDisplay.innerHTML = '';
+                savedComments.forEach(commentText => {
+                    const commentElement = document.createElement('div');
+                    commentElement.classList.add('comment-item');
+                    commentElement.textContent = commentText;
+                    commentsDisplay.appendChild(commentElement);
+                });
+            };
+            const saveComment = (commentText) => {
+                const savedComments = JSON.parse(localStorage.getItem(commentsStorageKey)) || [];
+                savedComments.push(commentText);
+                localStorage.setItem(commentsStorageKey, JSON.stringify(savedComments));
+            };
+            commentForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newComment = commentInput.value.trim();
+                if (newComment) {
+                    saveComment(newComment);
+                    loadComments();
+                    commentInput.value = '';
+                }
+            });
+            loadComments();
+            // Lógica para reformas: toggle details
+            document.querySelectorAll('.reform-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    card.classList.toggle('active');
+                });
+            });
+            // Slider automático en hero
+            const slider = document.getElementById('slider');
+            const dots = document.querySelectorAll('.dot');
+            let currentSlide = 0;
+            const slideCount = 3;
+            function showSlide(index) {
+                if (slider) {
+                    slider.style.transform = `translateX(-${index * (100 / slideCount)}%)`;
+                    dots.forEach(dot => dot.classList.remove('active'));
+                    dots[index].classList.add('active');
+                }
+            }
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slideCount;
+                showSlide(currentSlide);
+            }
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    currentSlide = index;
+                    showSlide(currentSlide);
+                });
+            });
+            setInterval(nextSlide, 5000);
+
+            // -- LÓGICA PARA LA LÍNEA DE TIEMPO --
+            const timelineSlider = document.querySelector('.timeline-slider');
+            const prevButton = document.querySelector('.timeline-nav.prev');
+            const nextButton = document.querySelector('.timeline-nav.next');
+
+            if (timelineSlider && prevButton && nextButton) {
+                const scrollAmount = () => {
+                    // Desplazarse el ancho de un elemento a la vez
+                    return timelineSlider.querySelector('.timeline-item').offsetWidth;
+                };
+
+                nextButton.addEventListener('click', () => {
+                    timelineSlider.scrollLeft += scrollAmount();
+                });
+
+                prevButton.addEventListener('click', () => {
+                    timelineSlider.scrollLeft -= scrollAmount();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
